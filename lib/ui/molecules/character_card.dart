@@ -11,13 +11,13 @@ class CharacterCard extends StatefulWidget {
   final VoidCallback? onAction;
 
   const CharacterCard({
-    Key? key,
+    super.key,
     required this.name,
     required this.subtitle,
     this.avatarUrl = '',
     this.onTap,
     this.onAction,
-  }) : super(key: key);
+  });
 
   @override
   _CharacterCardState createState() => _CharacterCardState();
@@ -46,12 +46,16 @@ class _CharacterCardState extends State<CharacterCard> {
         child: AnimatedContainer(
           duration: const Duration(milliseconds: 180),
           curve: Curves.easeOut,
-          transform: Matrix4.identity()..scale(scale),
+          transform: Matrix4.identity()..scale(scale, scale, 1.0),
           decoration: BoxDecoration(
             color: AppColors.surface,
             borderRadius: BorderRadius.circular(12),
             boxShadow: [
-              BoxShadow(color: AppColors.cardShadow, blurRadius: elevation, offset: const Offset(0, elevation / 2)),
+              BoxShadow(
+                color: AppColors.cardShadow, 
+                blurRadius: elevation, 
+                offset: Offset(0, elevation / 2),
+              ),
             ],
           ),
           padding: const EdgeInsets.all(12),
@@ -61,7 +65,7 @@ class _CharacterCardState extends State<CharacterCard> {
               // avatar
               CircleAvatar(
                 radius: 28,
-                backgroundColor: AppColors.primary.withOpacity(0.1),
+                backgroundColor: AppColors.primary.withValues(alpha: 0.1),
                 child: Text(
                   widget.name.isNotEmpty ? widget.name[0].toUpperCase() : '?',
                   style: const TextStyle(color: AppColors.primary, fontWeight: FontWeight.bold),

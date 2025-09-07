@@ -1,9 +1,7 @@
 import 'package:flutter/material.dart';
-import 'package:google_fonts/google_fonts.dart';
 import 'tela_criacao_personagem.dart';
 import 'tela_lista_personagens.dart';
 import 'tela_configuracoes.dart';
-
 
 class TelaInicial extends StatefulWidget {
   const TelaInicial({super.key});
@@ -16,9 +14,9 @@ class _TelaInicialState extends State<TelaInicial> {
   int _selectedIndex = 0;
 
   static final List<Widget> _pages = <Widget>[
-    TelaListaPersonagens(),
-    TelaCriacaoPersonagem(),
-    TelaConfiguracoes(),
+    const TelaListaPersonagens(),
+    const TelaCriacaoPersonagem(),
+    const TelaConfiguracoes(),
   ];
 
   void _onItemTapped(int index) {
@@ -34,7 +32,7 @@ class _TelaInicialState extends State<TelaInicial> {
       bottomNavigationBar: BottomNavigationBar(
         currentIndex: _selectedIndex,
         onTap: _onItemTapped,
-        backgroundColor: Colors.black.withOpacity(0.95),
+        backgroundColor: Colors.black.withValues(alpha: 0.95),
         selectedItemColor: Colors.amber,
         unselectedItemColor: Colors.white70,
         items: const [
