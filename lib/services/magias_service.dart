@@ -8,7 +8,6 @@ class MagiasService {
   static List<Map<String, dynamic>>? _allSpellsIndex; // Index de todas as magias
   
   Future<List<Magia>> fetchMagias({String language = 'en', int limit = 100}) async {
-    // Retorna cache se já existir e tiver magias suficientes
     if (_cachedMagias != null && _cachedMagias!.length >= limit) {
       return _cachedMagias!.take(limit).toList();
     }
@@ -26,14 +25,11 @@ class MagiasService {
         final Map<String, dynamic> data = jsonDecode(response.body);
         final List<dynamic> results = data['results'];
         
-        // Salvar index para buscas futuras
         _allSpellsIndex = results.cast<Map<String, dynamic>>();
         
-        // Carregar mais magias baseado no limite
         List<Magia> magias = _cachedMagias ?? [];
-        int maxMagias = limit.clamp(20, 150); // Entre 20 e 150 magias
+        int maxMagias = limit.clamp(20, 150); 
         
-        // Se já temos magias em cache, continuar de onde paramos
         int startIndex = magias.length;
         
         for (int i = startIndex; i < results.length && magias.length < maxMagias; i++) {
@@ -53,11 +49,9 @@ class MagiasService {
               magias.add(Magia.fromJson(spellData));
             }
           } catch (e) {
-            // Ignora magias com erro e continua
             continue;
           }
           
-          // Pequena pausa para evitar sobrecarga da API
           await Future.delayed(Duration(milliseconds: 50));
         }
         
@@ -73,7 +67,6 @@ class MagiasService {
 
   Future<Magia?> fetchMagiaByName(String name, {String language = 'en'}) async {
     try {
-      // Converter nome para o formato da API (lowercase com hífens)
       final formattedName = name.toLowerCase()
           .replaceAll(' ', '-')
           .replaceAll(RegExp(r'[^a-z0-9\-]'), '');
@@ -90,7 +83,7 @@ class MagiasService {
         final Map<String, dynamic> data = jsonDecode(response.body);
         return Magia.fromJson(data);
       } else if (response.statusCode == 404) {
-        return null; // Magia não encontrada
+        return null; 
       } else {
         throw Exception('Erro ao buscar magia: ${response.statusCode}');
       }
