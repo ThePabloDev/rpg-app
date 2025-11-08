@@ -1,20 +1,13 @@
 import 'package:flutter/material.dart';
-import '../ui/screens/templates/app_template.dart';
-import '../ui/atoms/rpg_text.dart';
+import '../views/lista_personagens_view.dart';
 
+/// Wrapper para manter compatibilidade com navegação antiga
+/// Redireciona para a nova ListaPersonagensView com arquitetura MVVM
 class TelaListaPersonagens extends StatelessWidget {
   const TelaListaPersonagens({super.key});
 
   @override
   Widget build(BuildContext context) {
-    return const AppTemplate(
-      title: 'Meus Personagens',
-      body: Center(
-        child: RPGText(
-          'Nenhum personagem criado ainda.',
-          style: RPGTextStyle.body,
-        ),
-      ),
-    );
+    return const ListaPersonagensView();
   }
 }

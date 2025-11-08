@@ -1,21 +1,12 @@
 import 'package:flutter/material.dart';
-import '../ui/screens/templates/auth_template.dart';
-import '../ui/organisms/register_form_organism.dart';
+import '../views/cadastro_view.dart';
 
+/// Wrapper para manter compatibilidade - redireciona para a nova CadastroView (MVVM)
 class TelaCadastro extends StatelessWidget {
   const TelaCadastro({super.key});
 
   @override
   Widget build(BuildContext context) {
-    return AuthTemplate(
-      child: RegisterFormOrganism(
-        onRegister: () {
-          Navigator.pop(context, true);
-        },
-        onNavigateToLogin: () {
-          Navigator.pop(context);
-        },
-      ),
-    );
+    return const CadastroView();
   }
 }
