@@ -1,5 +1,7 @@
+import 'dart:math';
 import 'package:flutter/material.dart';
 import '../core/base_viewmodel.dart';
+import '../services/personagem_service.dart';
 
 /// Modelo de dados para um personagem
 class Personagem {
@@ -266,8 +268,9 @@ class PersonagemViewModel extends BaseViewModel {
   }
 
   int _rolarAtributo() {
-    // Rola 4d6 e descarta o menor
-    final List<int> rolagens = List.generate(4, (_) => 1 + (DateTime.now().microsecondsSinceEpoch % 6));
+    // Rola 4d6 e descarta o menor (método padrão D&D 5e)
+    final random = Random();
+    final List<int> rolagens = List.generate(4, (_) => 1 + random.nextInt(6));
     rolagens.sort();
     return rolagens.skip(1).reduce((a, b) => a + b);
   }
@@ -297,10 +300,8 @@ class PersonagemViewModel extends BaseViewModel {
 
     final resultado = await executeWithLoadingAndError<bool>(
       () async {
-        await Future.delayed(Duration(seconds: 1)); // Simula criação
-
         final novoPersonagem = Personagem(
-          id: DateTime.now().millisecondsSinceEpoch.toString(),
+          id: PersonagemService.generateId(),
           nome: nomeController.text.trim(),
           classe: _classeSelecionada,
           raca: _racaSelecionada,
@@ -316,11 +317,16 @@ class PersonagemViewModel extends BaseViewModel {
           atualizadoEm: DateTime.now(),
         );
 
-        _personagens.add(novoPersonagem);
-        _aplicarFiltros();
-        limparFormulario();
-
-        return true;
+        final result = await PersonagemService.criarPersonagem(novoPersonagem);
+        
+        if (result.success && result.personagem != null) {
+          _personagens.add(result.personagem!);
+          _aplicarFiltros();
+          limparFormulario();
+          return true;
+        } else {
+          throw Exception(result.error ?? 'Erro ao criar personagem');
+        }
       },
       errorPrefix: 'Erro ao criar personagem',
     );
@@ -332,45 +338,14 @@ class PersonagemViewModel extends BaseViewModel {
   Future<void> carregarPersonagens() async {
     await executeWithLoadingAndError(
       () async {
-        await Future.delayed(Duration(seconds: 1)); // Simula carregamento
-
-        // Personagens de exemplo
-        _personagens = [
-          Personagem(
-            id: '1',
-            nome: 'Aragorn',
-            classe: 'Ranger',
-            raca: 'Humano',
-            nivel: 5,
-            forca: 16,
-            destreza: 14,
-            constituicao: 15,
-            inteligencia: 12,
-            sabedoria: 15,
-            carisma: 13,
-            historia: 'Um ranger experiente das terras selvagens.',
-            criadoEm: DateTime.now().subtract(Duration(days: 10)),
-            atualizadoEm: DateTime.now().subtract(Duration(days: 1)),
-          ),
-          Personagem(
-            id: '2',
-            nome: 'Gandalf',
-            classe: 'Mago',
-            raca: 'Humano',
-            nivel: 10,
-            forca: 10,
-            destreza: 11,
-            constituicao: 14,
-            inteligencia: 18,
-            sabedoria: 16,
-            carisma: 15,
-            historia: 'Um poderoso mago das terras médias.',
-            criadoEm: DateTime.now().subtract(Duration(days: 20)),
-            atualizadoEm: DateTime.now().subtract(Duration(days: 2)),
-          ),
-        ];
-
-        _aplicarFiltros();
+        final result = await PersonagemService.getPersonagens();
+        
+        if (result.success && result.personagens != null) {
+          _personagens = result.personagens!;
+          _aplicarFiltros();
+        } else {
+          throw Exception(result.error ?? 'Erro ao carregar personagens');
+        }
       },
       errorPrefix: 'Erro ao carregar personagens',
     );
@@ -433,16 +408,20 @@ class PersonagemViewModel extends BaseViewModel {
   Future<bool> removerPersonagem(String id) async {
     final resultado = await executeWithLoadingAndError<bool>(
       () async {
-        await Future.delayed(Duration(milliseconds: 500));
+        final result = await PersonagemService.excluirPersonagem(id);
+        
+        if (result.success) {
+          _personagens.removeWhere((p) => p.id == id);
+          _aplicarFiltros();
 
-        _personagens.removeWhere((p) => p.id == id);
-        _aplicarFiltros();
+          if (_personagemSelecionado?.id == id) {
+            _personagemSelecionado = null;
+          }
 
-        if (_personagemSelecionado?.id == id) {
-          _personagemSelecionado = null;
+          return true;
+        } else {
+          throw Exception(result.error ?? 'Erro ao remover personagem');
         }
-
-        return true;
       },
       errorPrefix: 'Erro ao remover personagem',
     );

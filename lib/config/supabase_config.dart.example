@@ -1,0 +1,17 @@
+/// 🔑 EXEMPLO DE CONFIGURAÇÃO - COPIE E COLE SUAS CREDENCIAIS AQUI
+/// 
+/// 1. Crie um projeto em https://supabase.com/dashboard
+/// 2. Vá em Settings > API 
+/// 3. Copie sua URL e anon key
+/// 4. Substitua os valores abaixo
+
+/// Configuração do Supabase
+class SupabaseConfig {
+  // 🚨 SUBSTITUA PELAS SUAS CREDENCIAIS:
+  static const String url = 'https://YOUR_PROJECT_ID.supabase.co';
+  static const String anonKey = 'YOUR_ANON_KEY_HERE';
+  
+  // Configurações opcionais
+  static const bool enableDebug = true; // Mude para false em produção
+  static const Duration timeout = Duration(seconds: 30);
+}

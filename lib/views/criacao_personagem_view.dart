@@ -1,9 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import '../viewmodels/personagem_viewmodel.dart';
-import '../ui/screens/templates/app_template.dart';
-import '../ui/atoms/rpg_text.dart';
-import '../ui/atoms/rpg_text_field.dart';
 
 /// View para criação de personagem usando arquitetura MVVM
 class CriacaoPersonagemView extends StatelessWidget {
@@ -13,8 +10,19 @@ class CriacaoPersonagemView extends StatelessWidget {
   Widget build(BuildContext context) {
     return Consumer<PersonagemViewModel>(
       builder: (context, personagemViewModel, child) {
-        return AppTemplate(
-          title: 'Criar Personagem',
+        return Scaffold(
+          backgroundColor: const Color(0xFF1A0E2E),
+          appBar: AppBar(
+            title: const Text(
+              'Criar Personagem',
+              style: TextStyle(
+                fontWeight: FontWeight.bold,
+                color: Colors.white,
+              ),
+            ),
+            backgroundColor: const Color(0xFF1A0E2E),
+            foregroundColor: Colors.white,
+          ),
           body: SingleChildScrollView(
             padding: const EdgeInsets.all(16),
             child: Column(
@@ -25,10 +33,14 @@ class CriacaoPersonagemView extends StatelessWidget {
                   title: 'Informações Básicas',
                   icon: Icons.person,
                   children: [
-                    RPGTextField(
+                    TextFormField(
                       controller: personagemViewModel.nomeController,
-                      hintText: 'Nome do personagem',
-                      prefixIcon: Icons.badge,
+                      decoration: const InputDecoration(
+                        hintText: 'Nome do personagem',
+                        prefixIcon: Icon(Icons.badge),
+                        border: OutlineInputBorder(),
+                      ),
+                      style: const TextStyle(color: Colors.white),
                     ),
                     const SizedBox(height: 16),
                     
@@ -78,7 +90,7 @@ class CriacaoPersonagemView extends StatelessWidget {
                     Row(
                       mainAxisAlignment: MainAxisAlignment.spaceBetween,
                       children: [
-                        const RPGText('Atributos do Personagem', style: RPGTextStyle.body),
+                        const Text('Atributos do Personagem', style: TextStyle(color: Colors.white)),
                         ElevatedButton.icon(
                           onPressed: personagemViewModel.rolarAtributos,
                           icon: const Icon(Icons.casino, size: 16),
@@ -114,10 +126,14 @@ class CriacaoPersonagemView extends StatelessWidget {
                   title: 'História (Opcional)',
                   icon: Icons.auto_stories,
                   children: [
-                    RPGTextField(
+                    TextFormField(
                       controller: personagemViewModel.historiaController,
-                      hintText: 'Escreva a história do seu personagem...',
+                      decoration: const InputDecoration(
+                        hintText: 'Escreva a história do seu personagem...',
+                        border: OutlineInputBorder(),
+                      ),
                       maxLines: 4,
+                      style: const TextStyle(color: Colors.white),
                     ),
                   ],
                 ),
@@ -201,10 +217,13 @@ class CriacaoPersonagemView extends StatelessWidget {
               children: [
                 Icon(icon, color: Colors.amber, size: 20),
                 const SizedBox(width: 8),
-                RPGText(
+                Text(
                   title,
-                  style: RPGTextStyle.subtitle,
-                  color: Colors.amber,
+                  style: const TextStyle(
+                    fontSize: 18,
+                    fontWeight: FontWeight.bold,
+                    color: Colors.amber,
+                  ),
                 ),
               ],
             ),

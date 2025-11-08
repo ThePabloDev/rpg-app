@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import '../core/base_viewmodel.dart';
+import '../services/auth_service.dart';
 
 /// ViewModel responsável pelo gerenciamento de estado de autenticação
 class AuthViewModel extends BaseViewModel {
@@ -144,20 +145,18 @@ class AuthViewModel extends BaseViewModel {
 
     final result = await executeWithLoadingAndError<bool>(
       () async {
-        // Simula chamada de API de login
-        await Future.delayed(Duration(seconds: 2));
+        final authResult = await AuthService.signIn(
+          emailController.text,
+          passwordController.text,
+        );
         
-        // Validação simples para demo
-        final email = emailController.text;
-        final password = passwordController.text;
-        
-        if (email.isNotEmpty && email.contains('@') && password.length >= 6) {
-          _userEmail = email;
-          _userName = _extractNameFromEmail(email);
+        if (authResult.success && authResult.user != null) {
           _isLoggedIn = true;
+          _userEmail = authResult.user!.email;
+          _userName = authResult.user!.nome ?? 'Usuário';
           return true;
         } else {
-          throw Exception('Email ou senha inválidos');
+          throw Exception(authResult.error ?? 'Erro no login');
         }
       },
       errorPrefix: 'Erro ao fazer login',
@@ -188,31 +187,20 @@ class AuthViewModel extends BaseViewModel {
 
     final result = await executeWithLoadingAndError<bool>(
       () async {
-        // Validações
-        if (name.trim().length < 2) {
-          throw Exception('Nome deve ter pelo menos 2 caracteres');
+        final authResult = await AuthService.signUp(
+          email: email,
+          password: password,
+          nome: name,
+        );
+        
+        if (authResult.success && authResult.user != null) {
+          _isLoggedIn = true;
+          _userEmail = authResult.user!.email;
+          _userName = authResult.user!.nome ?? name;
+          return true;
+        } else {
+          throw Exception(authResult.error ?? 'Erro no cadastro');
         }
-        
-        if (!email.contains('@')) {
-          throw Exception('Email inválido');
-        }
-        
-        if (password.length < 6) {
-          throw Exception('Senha deve ter pelo menos 6 caracteres');
-        }
-        
-        if (password != confirmPassword) {
-          throw Exception('Senhas não coincidem');
-        }
-
-        // Simula chamada de API de cadastro
-        await Future.delayed(Duration(seconds: 2));
-        
-        _userName = name;
-        _userEmail = email;
-        _isLoggedIn = true;
-        
-        return true;
       },
       errorPrefix: 'Erro ao cadastrar',
     );
@@ -221,19 +209,25 @@ class AuthViewModel extends BaseViewModel {
   }
 
   /// Realiza logout do usuário
-  Future<void> logout() async {
-    await executeWithLoadingAndError(
+  Future<bool> logout() async {
+    final result = await executeWithLoadingAndError<bool>(
       () async {
-        // Simula chamada de API de logout
-        await Future.delayed(Duration(milliseconds: 500));
+        final authResult = await AuthService.signOut();
         
-        _isLoggedIn = false;
-        _userEmail = null;
-        _userName = null;
+        if (authResult.success) {
+          _isLoggedIn = false;
+          _userEmail = null;
+          _userName = null;
+          clearAllFields();
+          return true;
+        } else {
+          throw Exception(authResult.error ?? 'Erro no logout');
+        }
       },
       errorPrefix: 'Erro ao fazer logout',
-      showLoading: false,
     );
+
+    return result ?? false;
   }
 
   /// Verifica se o usuário está autenticado (verificação de sessão)
@@ -251,10 +245,13 @@ class AuthViewModel extends BaseViewModel {
     );
   }
 
-  /// Extrai o nome do usuário baseado no email
-  String _extractNameFromEmail(String email) {
-    final localPart = email.split('@')[0];
-    return localPart.replaceAll('.', ' ').toUpperCase();
+  /// Limpa todos os campos dos formulários
+  void clearAllFields() {
+    emailController.clear();
+    passwordController.clear();
+    nameController.clear();
+    confirmPasswordController.clear();
+    clearErrors();
   }
 
   /// Valida email

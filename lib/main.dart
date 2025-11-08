@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
+import 'package:supabase_flutter/supabase_flutter.dart';
 import 'splash_screen.dart';
 import 'viewmodels/auth_viewmodel.dart';
 import 'viewmodels/magias_viewmodel.dart';
@@ -17,8 +18,18 @@ import 'views/magias_view.dart';
 import 'views/configuracoes_view.dart';
 import 'views/criacao_personagem_view.dart';
 import 'views/lista_personagens_view.dart';
+import 'config/supabase_config.dart';
 
-void main() {
+void main() async {
+  WidgetsFlutterBinding.ensureInitialized();
+  
+  // Inicializa Supabase
+  await Supabase.initialize(
+    url: SupabaseConfig.url,
+    anonKey: SupabaseConfig.anonKey,
+    debug: SupabaseConfig.enableDebug,
+  );
+  
   runApp(const MyApp());
 }
 
