@@ -24,9 +24,8 @@ class AuthViewModel extends BaseViewModel {
   String? _userName;
 
   AuthViewModel() {
-    // Valores de teste para facilitar desenvolvimento
-    emailController.text = 'test@example.com';
-    passwordController.text = '123456';
+    // Verifica automaticamente se há usuário logado
+    checkAuthStatus();
   }
 
   /// Getters para UI
@@ -234,12 +233,18 @@ class AuthViewModel extends BaseViewModel {
   Future<void> checkAuthStatus() async {
     await executeWithLoadingAndError(
       () async {
-        // Simula verificação de token/sessão
-        await Future.delayed(Duration(seconds: 1));
+        // Verificação real do Supabase Auth
+        final currentUser = AuthService.currentUser;
         
-        // Por enquanto, vamos manter o usuário deslogado
-        // Futuramente isso verificará SharedPreferences ou Firebase Auth
-        _isLoggedIn = false;
+        if (currentUser != null) {
+          _isLoggedIn = true;
+          _userEmail = currentUser.email;
+          _userName = currentUser.nome ?? 'Usuário';
+        } else {
+          _isLoggedIn = false;
+          _userEmail = null;
+          _userName = null;
+        }
       },
       showLoading: false,
     );
@@ -296,6 +301,16 @@ class AuthViewModel extends BaseViewModel {
       return 'Senhas não coincidem';
     }
     return null;
+  }
+
+  /// Método de debug para verificar estado atual
+  Map<String, dynamic> getDebugInfo() {
+    return {
+      'viewModelLoggedIn': _isLoggedIn,
+      'viewModelEmail': _userEmail,
+      'viewModelName': _userName,
+      'authServiceInfo': AuthService.getDebugInfo(),
+    };
   }
 
   @override

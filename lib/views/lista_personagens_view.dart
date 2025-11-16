@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import '../viewmodels/personagem_viewmodel.dart';
 import '../viewmodels/auth_viewmodel.dart';
+import 'edicao_personagem_view.dart';
 
 class ListaPersonagensView extends StatefulWidget {
   const ListaPersonagensView({super.key});
@@ -464,13 +465,7 @@ class _ListaPersonagensViewState extends State<ListaPersonagensView> {
                     onSelected: (value) async {
                       switch (value) {
                         case 'edit':
-                          // TODO: Implementar edição quando necessário
-                          ScaffoldMessenger.of(context).showSnackBar(
-                            const SnackBar(
-                              content: Text('Edição será implementada em breve'),
-                              backgroundColor: Color(0xFF9C27B0),
-                            ),
-                          );
+                          _editarPersonagem(personagem);
                           break;
                         case 'duplicate':
                           // TODO: Implementar duplicação quando necessário
@@ -759,11 +754,11 @@ class _ListaPersonagensViewState extends State<ListaPersonagensView> {
   }
 
   Widget _buildStatusGrid(Personagem personagem) {
-    // Por enquanto usando valores padrão já que essas propriedades não existem no modelo atual
-    final vida = 0;
-    final vidaMaxima = 0; 
-    final mana = 0;
-    final manaMaxima = 0;
+    // Calculando valores reais de vida e mana
+    final vidaMaxima = personagem.pontosVida;
+    final vida = vidaMaxima; // Por padrão, personagem começa com vida cheia
+    final manaMaxima = personagem.pontosMana;
+    final mana = manaMaxima; // Por padrão, personagem começa com mana cheia
     
     return Column(
       children: [
@@ -796,7 +791,7 @@ class _ListaPersonagensViewState extends State<ListaPersonagensView> {
             Expanded(
               child: _buildSimpleStatus(
                 'CA', 
-                '10', // TODO: Implementar cálculo de classe de armadura
+                '${personagem.classeArmadura}', // Usando cálculo real de classe de armadura
                 Icons.shield,
               ),
             ),
@@ -1009,5 +1004,20 @@ class _ListaPersonagensViewState extends State<ListaPersonagensView> {
         ],
       ),
     );
+  }
+
+  /// Navega para a tela de edição do personagem
+  Future<void> _editarPersonagem(Personagem personagem) async {
+    final resultado = await Navigator.push<bool>(
+      context,
+      MaterialPageRoute(
+        builder: (context) => EdicaoPersonagemView(personagem: personagem),
+      ),
+    );
+
+    // Se houve alteração, recarrega a lista
+    if (resultado == true && mounted) {
+      context.read<PersonagemViewModel>().carregarPersonagens();
+    }
   }
 }

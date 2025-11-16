@@ -75,6 +75,22 @@ class AuthService {
     });
   }
 
+  /// Método de debug para verificar estado atual
+  static Map<String, dynamic> getDebugInfo() {
+    final user = _supabase.auth.currentUser;
+    final session = _supabase.auth.currentSession;
+    
+    return {
+      'hasUser': user != null,
+      'userEmail': user?.email,
+      'userId': user?.id,
+      'hasSession': session != null,
+      'sessionValid': session != null && !session.isExpired,
+      'expiresAt': session?.expiresAt,
+      'userMetadata': user?.userMetadata,
+    };
+  }
+
   /// Realiza login com email e senha
   static Future<AuthResult> signIn(String email, String password) async {
     try {
@@ -116,6 +132,11 @@ class AuthService {
         return AuthResult.error('Erro desconhecido no cadastro');
       }
     } on AuthException catch (e) {
+      // Se o usuário já existe, tenta fazer login automaticamente
+      if (e.message.toLowerCase().contains('user already registered') ||
+          e.message.toLowerCase().contains('already registered')) {
+        return await signIn(email, password);
+      }
       return AuthResult.error(_getAuthErrorMessage(e.message));
     } catch (e) {
       return AuthResult.error('Erro de conexão. Verifique sua internet.');
@@ -178,25 +199,41 @@ class AuthService {
 
   /// Converte mensagens de erro do Supabase para português
   static String _getAuthErrorMessage(String error) {
-    switch (error.toLowerCase()) {
-      case 'invalid login credentials':
-      case 'invalid email or password':
-        return 'Email ou senha incorretos';
-      case 'email not confirmed':
-        return 'Email não confirmado. Verifique sua caixa de entrada';
-      case 'user already registered':
-        return 'Este email já está cadastrado';
-      case 'password should be at least 6 characters':
-        return 'A senha deve ter pelo menos 6 caracteres';
-      case 'signup is disabled':
-        return 'Cadastro desabilitado. Entre em contato com o suporte';
-      case 'email address is invalid':
-        return 'Endereço de email inválido';
-      case 'password is too weak':
-        return 'Senha muito fraca. Use letras, números e símbolos';
-      default:
-        return error.isNotEmpty ? error : 'Erro desconhecido';
+    final errorLower = error.toLowerCase();
+    
+    if (errorLower.contains('invalid login credentials') || 
+        errorLower.contains('invalid email or password')) {
+      return 'Email ou senha incorretos';
     }
+    if (errorLower.contains('email not confirmed')) {
+      return 'Email não confirmado. Verifique sua caixa de entrada';
+    }
+    if (errorLower.contains('user already registered') || 
+        errorLower.contains('already registered')) {
+      return 'Este email já está cadastrado';
+    }
+    if (errorLower.contains('password should be at least 6 characters')) {
+      return 'A senha deve ter pelo menos 6 caracteres';
+    }
+    if (errorLower.contains('signup is disabled')) {
+      return 'Cadastro desabilitado. Entre em contato com o suporte';
+    }
+    if (errorLower.contains('email address is invalid')) {
+      return 'Endereço de email inválido';
+    }
+    if (errorLower.contains('password is too weak')) {
+      return 'Senha muito fraca. Use letras, números e símbolos';
+    }
+    if (errorLower.contains('email rate limit exceeded')) {
+      return 'Muitas tentativas. Aguarde alguns minutos';
+    }
+    if (errorLower.contains('invalid refresh token') || 
+        errorLower.contains('refresh token not found')) {
+      return 'Sessão expirada. Faça login novamente';
+    }
+    
+    // Retorna o erro original se não conseguiu mapear
+    return error.isNotEmpty ? error : 'Erro desconhecido';
   }
 
   /// Valida formato de email

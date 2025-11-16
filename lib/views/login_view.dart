@@ -1,9 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import '../viewmodels/auth_viewmodel.dart';
-import '../ui/screens/templates/app_template.dart';
-import '../ui/atoms/rpg_text.dart';
-import '../ui/atoms/rpg_text_field.dart';
 
 /// View para login usando arquitetura MVVM
 class LoginView extends StatelessWidget {
@@ -20,61 +17,137 @@ class LoginView extends StatelessWidget {
           });
         }
 
-        return AppTemplate(
-            title: 'Login',
-            appBar: null, // Remove app bar para tela de login
-            body: Center(
+        return Scaffold(
+          backgroundColor: const Color(0xFF0A0A0A),
+          body: Container(
+            decoration: BoxDecoration(
+              gradient: LinearGradient(
+                begin: Alignment.topCenter,
+                end: Alignment.bottomCenter,
+                colors: [
+                  const Color(0xFF1A0E2E),
+                  const Color(0xFF0A0A0A),
+                ],
+              ),
+            ),
+            child: Center(
               child: SingleChildScrollView(
                 padding: const EdgeInsets.all(24),
                 child: Column(
                   mainAxisAlignment: MainAxisAlignment.center,
                   children: [
-                    // Logo ou título do app
-                    const Icon(
-                      Icons.castle,
-                      size: 80,
-                      color: Colors.amber,
+                    // Logo melhorado
+                    Container(
+                      padding: const EdgeInsets.all(20),
+                      decoration: BoxDecoration(
+                        shape: BoxShape.circle,
+                        gradient: RadialGradient(
+                          colors: [
+                            Colors.amber.withValues(alpha: 0.3),
+                            Colors.transparent,
+                          ],
+                        ),
+                      ),
+                      child: const Icon(
+                        Icons.casino,
+                        size: 100,
+                        color: Colors.amber,
+                      ),
                     ),
-                    const SizedBox(height: 16),
-                    const RPGText(
-                      'RPG Character Manager',
-                      style: RPGTextStyle.title,
-                      color: Colors.amber,
+                    const SizedBox(height: 24),
+                    
+                    // Título do app
+                    ShaderMask(
+                      shaderCallback: (bounds) => LinearGradient(
+                        colors: [Colors.amber, Colors.orange],
+                      ).createShader(bounds),
+                      child: const Text(
+                        'Ficha do Zé',
+                        style: TextStyle(
+                          fontSize: 42,
+                          fontWeight: FontWeight.bold,
+                          color: Colors.white,
+                        ),
+                      ),
                     ),
                     const SizedBox(height: 8),
-                    const RPGText(
-                      'Gerencie seus personagens e magias',
-                      style: RPGTextStyle.subtitle,
-                      color: Colors.grey,
+                    Text(
+                      'Seu companheiro de RPG',
+                      style: TextStyle(
+                        fontSize: 16,
+                        color: Colors.grey.shade400,
+                        fontStyle: FontStyle.italic,
+                      ),
                     ),
-                    const SizedBox(height: 32),
+                    const SizedBox(height: 48),
 
-                    // Formulário de login
-                    Card(
-                      elevation: 8,
+                    // Card de Login Estilizado
+                    Container(
+                      constraints: const BoxConstraints(maxWidth: 400),
+                      decoration: BoxDecoration(
+                        borderRadius: BorderRadius.circular(20),
+                        gradient: LinearGradient(
+                          begin: Alignment.topLeft,
+                          end: Alignment.bottomRight,
+                          colors: [
+                            const Color(0xFF2A1A3E),
+                            const Color(0xFF1A0E2E),
+                          ],
+                        ),
+                        boxShadow: [
+                          BoxShadow(
+                            color: Colors.amber.withValues(alpha: 0.1),
+                            blurRadius: 20,
+                            offset: const Offset(0, 10),
+                          ),
+                        ],
+                      ),
                       child: Padding(
-                        padding: const EdgeInsets.all(24),
+                        padding: const EdgeInsets.all(32),
                         child: Column(
                           children: [
-                            const RPGText(
-                              'Entrar na sua conta',
-                              style: RPGTextStyle.subtitle,
+                            // Título da seção
+                            const Text(
+                              'Entrar',
+                              style: TextStyle(
+                                fontSize: 24,
+                                fontWeight: FontWeight.bold,
+                                color: Colors.amber,
+                              ),
                             ),
-                            const SizedBox(height: 24),
+                            const SizedBox(height: 32),
 
                             // Campo de email
                             Column(
                               crossAxisAlignment: CrossAxisAlignment.start,
                               children: [
-                                RPGTextField(
-                                  controller: authViewModel.emailController,
-                                  hintText: 'Email',
-                                  prefixIcon: Icons.email,
-                                  keyboardType: TextInputType.emailAddress,
+                                Container(
+                                  decoration: BoxDecoration(
+                                    borderRadius: BorderRadius.circular(12),
+                                    color: const Color(0xFF1A0E2E),
+                                    border: Border.all(
+                                      color: Colors.amber.withValues(alpha: 0.3),
+                                    ),
+                                  ),
+                                  child: TextFormField(
+                                    controller: authViewModel.emailController,
+                                    keyboardType: TextInputType.emailAddress,
+                                    style: const TextStyle(color: Colors.white),
+                                    decoration: InputDecoration(
+                                      hintText: 'Email',
+                                      hintStyle: TextStyle(color: Colors.grey.shade400),
+                                      prefixIcon: const Icon(Icons.email, color: Colors.amber),
+                                      border: InputBorder.none,
+                                      contentPadding: const EdgeInsets.symmetric(
+                                        horizontal: 16,
+                                        vertical: 16,
+                                      ),
+                                    ),
+                                  ),
                                 ),
                                 if (authViewModel.emailError != null)
                                   Padding(
-                                    padding: const EdgeInsets.only(top: 4),
+                                    padding: const EdgeInsets.only(top: 8, left: 16),
                                     child: Text(
                                       authViewModel.emailError!,
                                       style: const TextStyle(
@@ -85,29 +158,48 @@ class LoginView extends StatelessWidget {
                                   ),
                               ],
                             ),
-                            const SizedBox(height: 16),
+                            const SizedBox(height: 20),
 
                             // Campo de senha
                             Column(
                               crossAxisAlignment: CrossAxisAlignment.start,
                               children: [
-                                RPGTextField(
-                                  controller: authViewModel.passwordController,
-                                  hintText: 'Senha',
-                                  prefixIcon: Icons.lock,
-                                  obscureText: !authViewModel.showPassword,
-                                  suffixIcon: IconButton(
-                                    icon: Icon(
-                                      authViewModel.showPassword
-                                          ? Icons.visibility_off
-                                          : Icons.visibility,
+                                Container(
+                                  decoration: BoxDecoration(
+                                    borderRadius: BorderRadius.circular(12),
+                                    color: const Color(0xFF1A0E2E),
+                                    border: Border.all(
+                                      color: Colors.amber.withValues(alpha: 0.3),
                                     ),
-                                    onPressed: authViewModel.togglePasswordVisibility,
+                                  ),
+                                  child: TextFormField(
+                                    controller: authViewModel.passwordController,
+                                    obscureText: !authViewModel.showPassword,
+                                    style: const TextStyle(color: Colors.white),
+                                    decoration: InputDecoration(
+                                      hintText: 'Senha',
+                                      hintStyle: TextStyle(color: Colors.grey.shade400),
+                                      prefixIcon: const Icon(Icons.lock, color: Colors.amber),
+                                      suffixIcon: IconButton(
+                                        icon: Icon(
+                                          authViewModel.showPassword
+                                              ? Icons.visibility_off
+                                              : Icons.visibility,
+                                          color: Colors.amber,
+                                        ),
+                                        onPressed: authViewModel.togglePasswordVisibility,
+                                      ),
+                                      border: InputBorder.none,
+                                      contentPadding: const EdgeInsets.symmetric(
+                                        horizontal: 16,
+                                        vertical: 16,
+                                      ),
+                                    ),
                                   ),
                                 ),
                                 if (authViewModel.passwordError != null)
                                   Padding(
-                                    padding: const EdgeInsets.only(top: 4),
+                                    padding: const EdgeInsets.only(top: 8, left: 16),
                                     child: Text(
                                       authViewModel.passwordError!,
                                       style: const TextStyle(
@@ -118,7 +210,7 @@ class LoginView extends StatelessWidget {
                                   ),
                               ],
                             ),
-                            const SizedBox(height: 8),
+                            const SizedBox(height: 16),
 
                             // Lembrar-me
                             Row(
@@ -127,76 +219,104 @@ class LoginView extends StatelessWidget {
                                   value: authViewModel.rememberMe,
                                   onChanged: authViewModel.setRememberMe,
                                   activeColor: Colors.amber,
+                                  shape: RoundedRectangleBorder(
+                                    borderRadius: BorderRadius.circular(4),
+                                  ),
                                 ),
-                                const Text('Lembrar-me'),
+                                Text(
+                                  'Lembrar-me',
+                                  style: TextStyle(color: Colors.grey.shade300),
+                                ),
                                 const Spacer(),
                                 TextButton(
                                   onPressed: () {
-                                    // TODO: Implementar recuperação de senha
                                     ScaffoldMessenger.of(context).showSnackBar(
                                       const SnackBar(
-                                        content: Text('Função em desenvolvimento'),
+                                        content: Text('Em breve...'),
+                                        backgroundColor: Colors.amber,
                                       ),
                                     );
                                   },
                                   child: const Text(
                                     'Esqueci minha senha',
-                                    style: TextStyle(color: Colors.amber),
+                                    style: TextStyle(
+                                      color: Colors.amber,
+                                      fontSize: 12,
+                                    ),
                                   ),
                                 ),
                               ],
                             ),
-                            const SizedBox(height: 24),
+                            const SizedBox(height: 32),
 
-                            // Botão de login
-                            SizedBox(
+                            // Botão de login estilizado
+                            Container(
                               width: double.infinity,
+                              decoration: BoxDecoration(
+                                borderRadius: BorderRadius.circular(12),
+                                gradient: const LinearGradient(
+                                  colors: [Colors.amber, Colors.orange],
+                                ),
+                                boxShadow: [
+                                  BoxShadow(
+                                    color: Colors.amber.withValues(alpha: 0.3),
+                                    blurRadius: 8,
+                                    offset: const Offset(0, 4),
+                                  ),
+                                ],
+                              ),
                               child: ElevatedButton(
                                 onPressed: authViewModel.isLoading
                                     ? null
                                     : () => _handleLogin(context, authViewModel),
                                 style: ElevatedButton.styleFrom(
-                                  backgroundColor: Colors.amber,
-                                  foregroundColor: Colors.black,
-                                  padding: const EdgeInsets.symmetric(vertical: 16),
+                                  backgroundColor: Colors.transparent,
+                                  shadowColor: Colors.transparent,
+                                  padding: const EdgeInsets.symmetric(vertical: 18),
                                   shape: RoundedRectangleBorder(
-                                    borderRadius: BorderRadius.circular(8),
+                                    borderRadius: BorderRadius.circular(12),
                                   ),
                                 ),
                                 child: authViewModel.isLoading
                                     ? const SizedBox(
-                                        height: 20,
-                                        width: 20,
+                                        height: 24,
+                                        width: 24,
                                         child: CircularProgressIndicator(
-                                          strokeWidth: 2,
-                                          color: Colors.black,
+                                          strokeWidth: 3,
+                                          valueColor: AlwaysStoppedAnimation<Color>(Colors.black),
                                         ),
                                       )
                                     : const Text(
-                                        'Entrar',
+                                        'ENTRAR',
                                         style: TextStyle(
                                           fontSize: 16,
                                           fontWeight: FontWeight.bold,
+                                          color: Colors.black,
+                                          letterSpacing: 1.2,
                                         ),
                                       ),
                               ),
                             ),
-                            const SizedBox(height: 16),
+                            const SizedBox(height: 24),
 
-                            // Link para cadastro
+                            // Link para cadastro estilizado
                             Row(
                               mainAxisAlignment: MainAxisAlignment.center,
                               children: [
-                                const Text('Não tem uma conta? '),
+                                Text(
+                                  'Novo por aqui? ',
+                                  style: TextStyle(color: Colors.grey.shade400),
+                                ),
                                 TextButton(
                                   onPressed: () {
                                     Navigator.pushNamed(context, '/cadastro');
                                   },
                                   child: const Text(
-                                    'Cadastre-se',
+                                    'Criar conta',
                                     style: TextStyle(
                                       color: Colors.amber,
                                       fontWeight: FontWeight.bold,
+                                      fontSize: 16,
                                     ),
                                   ),
                                 ),
@@ -206,26 +326,34 @@ class LoginView extends StatelessWidget {
                         ),
                       ),
                     ),
-                    const SizedBox(height: 24),
+                    const SizedBox(height: 32),
 
-                    // Botão de acesso offline
+                    // Acesso offline discreto
                     TextButton.icon(
                       onPressed: () {
                         authViewModel.loginOffline();
                         Navigator.pushReplacementNamed(context, '/inicial');
                       },
-                      icon: const Icon(Icons.offline_bolt, color: Colors.grey),
-                      label: const Text(
-                        'Continuar offline',
-                        style: TextStyle(color: Colors.grey),
+                      icon: Icon(
+                        Icons.offline_bolt,
+                        color: Colors.grey.shade600,
+                        size: 18,
+                      ),
+                      label: Text(
+                        'Modo offline',
+                        style: TextStyle(
+                          color: Colors.grey.shade600,
+                          fontSize: 14,
+                        ),
                       ),
                     ),
                   ],
                 ),
               ),
             ),
-          );
-        },
+          ),
+        );
+      },
     );
   }
 

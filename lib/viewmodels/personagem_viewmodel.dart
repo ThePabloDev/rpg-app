@@ -55,6 +55,27 @@ class Personagem {
   /// Pontos de vida calculados
   int get pontosVida => (nivel * 8) + (nivel * modificadorConstituicao);
 
+  /// Pontos de mana calculados (baseado em Inteligência para magos)
+  int get pontosMana {
+    // Classes que usam mana e seus modificadores
+    switch (classe.toLowerCase()) {
+      case 'mago':
+      case 'feiticeiro':
+        return (nivel * 6) + (nivel * modificadorInteligencia);
+      case 'clerigo':
+      case 'druida':
+        return (nivel * 4) + (nivel * modificadorSabedoria);
+      case 'bardo':
+      case 'warlock':
+        return (nivel * 4) + (nivel * modificadorCarisma);
+      case 'ranger':
+      case 'paladino':
+        return nivel >= 2 ? ((nivel - 1) * 3) + (modificadorSabedoria > 0 ? modificadorSabedoria * 2 : 0) : 0;
+      default:
+        return 0; // Guerreiro, Bárbaro, etc. não têm mana
+    }
+  }
+
   /// Classe de armadura base
   int get classeArmadura => 10 + modificadorDestreza;
 
@@ -212,6 +233,10 @@ class PersonagemViewModel extends BaseViewModel {
         'Tiefling',
       ];
 
+  /// Getters para compatibilidade com a tela de edição
+  List<String> get classes => classesDisponiveis;
+  List<String> get racas => racasDisponiveis;
+
   /// Define a classe selecionada
   void setClasse(String classe) {
     _classeSelecionada = classe;
@@ -229,6 +254,19 @@ class PersonagemViewModel extends BaseViewModel {
     _nivel = novoNivel.clamp(1, 20);
     notifyListeners();
   }
+
+  /// Métodos para compatibilidade com a tela de edição
+  void selecionarClasse(String classe) => setClasse(classe);
+  void selecionarRaca(String raca) => setRaca(raca);
+  void selecionarNivel(int nivel) => setNivel(nivel);
+
+  /// Métodos para atualizar atributos individuais
+  void atualizarForca(int valor) => setAtributo('forca', valor);
+  void atualizarDestreza(int valor) => setAtributo('destreza', valor);
+  void atualizarConstituicao(int valor) => setAtributo('constituicao', valor);
+  void atualizarInteligencia(int valor) => setAtributo('inteligencia', valor);
+  void atualizarSabedoria(int valor) => setAtributo('sabedoria', valor);
+  void atualizarCarisma(int valor) => setAtributo('carisma', valor);
 
   /// Define um atributo
   void setAtributo(String atributo, int valor) {
@@ -289,6 +327,49 @@ class PersonagemViewModel extends BaseViewModel {
     _sabedoria = 10;
     _carisma = 10;
     notifyListeners();
+  }
+
+  /// Carrega um personagem para edição
+  void carregarPersonagemParaEdicao(Personagem personagem) {
+    nomeController.text = personagem.nome;
+    historiaController.text = personagem.historia ?? '';
+    _classeSelecionada = personagem.classe;
+    _racaSelecionada = personagem.raca;
+    _nivel = personagem.nivel;
+    _forca = personagem.forca;
+    _destreza = personagem.destreza;
+    _constituicao = personagem.constituicao;
+    _inteligencia = personagem.inteligencia;
+    _sabedoria = personagem.sabedoria;
+    _carisma = personagem.carisma;
+    notifyListeners();
+  }
+
+  /// Atualiza um personagem existente
+  Future<bool> atualizarPersonagem(String id) async {
+    if (nomeController.text.trim().isEmpty) {
+      setError('Nome do personagem é obrigatório');
+      return false;
+    }
+
+    final personagemAtualizado = Personagem(
+      id: id,
+      nome: nomeController.text.trim(),
+      classe: _classeSelecionada,
+      raca: _racaSelecionada,
+      nivel: _nivel,
+      forca: _forca,
+      destreza: _destreza,
+      constituicao: _constituicao,
+      inteligencia: _inteligencia,
+      sabedoria: _sabedoria,
+      carisma: _carisma,
+      historia: historiaController.text.trim().isNotEmpty ? historiaController.text.trim() : null,
+      criadoEm: DateTime.now(), // Precisaríamos salvar a data original
+      atualizadoEm: DateTime.now(),
+    );
+
+    return await editarPersonagem(id, personagemAtualizado);
   }
 
   /// Cria um novo personagem

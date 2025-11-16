@@ -1,11 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import '../viewmodels/auth_viewmodel.dart';
-import '../ui/screens/templates/app_template.dart';
-import '../ui/atoms/rpg_text.dart';
-import '../ui/atoms/rpg_text_field.dart';
 
-/// View para cadastro usando arquitetura MVVM
 class CadastroView extends StatelessWidget {
   const CadastroView({super.key});
 
@@ -13,225 +9,412 @@ class CadastroView extends StatelessWidget {
   Widget build(BuildContext context) {
     return Consumer<AuthViewModel>(
       builder: (context, authViewModel, child) {
-        return AppTemplate(
-          title: 'Cadastro',
-          body: Center(
-            child: SingleChildScrollView(
-              padding: const EdgeInsets.all(24),
+        return Scaffold(
+          backgroundColor: const Color(0xFF0A0A0A),
+          appBar: AppBar(
+            backgroundColor: Colors.transparent,
+            elevation: 0,
+            leading: IconButton(
+              icon: const Icon(Icons.arrow_back, color: Colors.amber),
+              onPressed: () => Navigator.pop(context),
+            ),
+          ),
+          body: Container(
+            decoration: BoxDecoration(
+              gradient: LinearGradient(
+                begin: Alignment.topCenter,
+                end: Alignment.bottomCenter,
+                colors: [
+                  const Color(0xFF0A0A0A),
+                  const Color(0xFF1A1A1A),
+                  const Color(0xFF2A1A3E),
+                ],
+              ),
+            ),
+            child: SafeArea(
               child: Column(
-                mainAxisAlignment: MainAxisAlignment.center,
                 children: [
-                  // Logo ou título do app
-                  const Icon(
-                    Icons.person_add,
-                    size: 80,
-                    color: Colors.amber,
-                  ),
-                  const SizedBox(height: 16),
-                  const RPGText(
-                    'Criar Nova Conta',
-                    style: RPGTextStyle.title,
-                    color: Colors.amber,
-                  ),
-                  const SizedBox(height: 8),
-                  const RPGText(
-                    'Preencha os dados para criar sua conta',
-                    style: RPGTextStyle.subtitle,
-                    color: Colors.grey,
-                  ),
-                  const SizedBox(height: 32),
-
-                  // Formulário de cadastro
-                  Card(
-                    elevation: 8,
-                    child: Padding(
+                  Expanded(
+                    child: SingleChildScrollView(
                       padding: const EdgeInsets.all(24),
                       child: Column(
                         children: [
-                          const RPGText(
-                            'Dados da Conta',
-                            style: RPGTextStyle.subtitle,
-                          ),
-                          const SizedBox(height: 24),
-
-                          // Campo de nome
-                          Column(
-                            crossAxisAlignment: CrossAxisAlignment.start,
-                            children: [
-                              RPGTextField(
-                                controller: authViewModel.nameController,
-                                hintText: 'Nome completo',
-                                prefixIcon: Icons.person,
-                                keyboardType: TextInputType.name,
+                          const SizedBox(height: 20),
+                          
+                          // Header
+                          Container(
+                            padding: const EdgeInsets.all(24),
+                            decoration: BoxDecoration(
+                              borderRadius: BorderRadius.circular(20),
+                              gradient: LinearGradient(
+                                colors: [
+                                  Colors.amber.withValues(alpha: 0.1),
+                                  Colors.amber.withValues(alpha: 0.05),
+                                ],
                               ),
-                              if (authViewModel.nameError != null)
-                                Padding(
-                                  padding: const EdgeInsets.only(top: 4),
-                                  child: Text(
-                                    authViewModel.nameError!,
-                                    style: const TextStyle(
-                                      color: Colors.red,
-                                      fontSize: 12,
+                              border: Border.all(
+                                color: Colors.amber.withValues(alpha: 0.3),
+                              ),
+                            ),
+                            child: Column(
+                              children: [
+                                Container(
+                                  padding: const EdgeInsets.all(16),
+                                  decoration: BoxDecoration(
+                                    shape: BoxShape.circle,
+                                    gradient: LinearGradient(
+                                      colors: [
+                                        Colors.amber.shade400,
+                                        Colors.amber.shade600,
+                                      ],
                                     ),
-                                  ),
-                                ),
-                            ],
-                          ),
-                          const SizedBox(height: 16),
-
-                          // Campo de email
-                          Column(
-                            crossAxisAlignment: CrossAxisAlignment.start,
-                            children: [
-                              RPGTextField(
-                                controller: authViewModel.emailController,
-                                hintText: 'Email',
-                                prefixIcon: Icons.email,
-                                keyboardType: TextInputType.emailAddress,
-                              ),
-                              if (authViewModel.emailError != null)
-                                Padding(
-                                  padding: const EdgeInsets.only(top: 4),
-                                  child: Text(
-                                    authViewModel.emailError!,
-                                    style: const TextStyle(
-                                      color: Colors.red,
-                                      fontSize: 12,
-                                    ),
-                                  ),
-                                ),
-                            ],
-                          ),
-                          const SizedBox(height: 16),
-
-                          // Campo de senha
-                          Column(
-                            crossAxisAlignment: CrossAxisAlignment.start,
-                            children: [
-                              RPGTextField(
-                                controller: authViewModel.passwordController,
-                                hintText: 'Senha (mínimo 6 caracteres)',
-                                prefixIcon: Icons.lock,
-                                obscureText: !authViewModel.showPassword,
-                                suffixIcon: IconButton(
-                                  icon: Icon(
-                                    authViewModel.showPassword
-                                        ? Icons.visibility_off
-                                        : Icons.visibility,
-                                  ),
-                                  onPressed: authViewModel.togglePasswordVisibility,
-                                ),
-                              ),
-                              if (authViewModel.passwordError != null)
-                                Padding(
-                                  padding: const EdgeInsets.only(top: 4),
-                                  child: Text(
-                                    authViewModel.passwordError!,
-                                    style: const TextStyle(
-                                      color: Colors.red,
-                                      fontSize: 12,
-                                    ),
-                                  ),
-                                ),
-                            ],
-                          ),
-                          const SizedBox(height: 16),
-
-                          // Campo de confirmação de senha
-                          Column(
-                            crossAxisAlignment: CrossAxisAlignment.start,
-                            children: [
-                              RPGTextField(
-                                controller: authViewModel.confirmPasswordController,
-                                hintText: 'Confirmar senha',
-                                prefixIcon: Icons.lock_outline,
-                                obscureText: !authViewModel.showPassword,
-                              ),
-                              if (authViewModel.confirmPasswordError != null)
-                                Padding(
-                                  padding: const EdgeInsets.only(top: 4),
-                                  child: Text(
-                                    authViewModel.confirmPasswordError!,
-                                    style: const TextStyle(
-                                      color: Colors.red,
-                                      fontSize: 12,
-                                    ),
-                                  ),
-                                ),
-                            ],
-                          ),
-                          const SizedBox(height: 24),
-
-                          // Botão de cadastro
-                          SizedBox(
-                            width: double.infinity,
-                            child: ElevatedButton(
-                              onPressed: authViewModel.isLoading
-                                  ? null
-                                  : () => _handleRegister(context, authViewModel),
-                              style: ElevatedButton.styleFrom(
-                                backgroundColor: Colors.amber,
-                                foregroundColor: Colors.black,
-                                padding: const EdgeInsets.symmetric(vertical: 16),
-                                shape: RoundedRectangleBorder(
-                                  borderRadius: BorderRadius.circular(8),
-                                ),
-                              ),
-                              child: authViewModel.isLoading
-                                  ? const SizedBox(
-                                      height: 20,
-                                      width: 20,
-                                      child: CircularProgressIndicator(
-                                        strokeWidth: 2,
-                                        color: Colors.black,
+                                    boxShadow: [
+                                      BoxShadow(
+                                        color: Colors.amber.withValues(alpha: 0.3),
+                                        blurRadius: 15,
+                                        offset: const Offset(0, 5),
                                       ),
-                                    )
-                                  : const Text(
-                                      'Criar Conta',
-                                      style: TextStyle(
-                                        fontSize: 16,
-                                        fontWeight: FontWeight.bold,
-                                      ),
-                                    ),
+                                    ],
+                                  ),
+                                  child: const Icon(
+                                    Icons.person_add,
+                                    size: 40,
+                                    color: Colors.black,
+                                  ),
+                                ),
+                                const SizedBox(height: 16),
+                                const Text(
+                                  'Ficha do Zé',
+                                  style: TextStyle(
+                                    fontSize: 32,
+                                    fontWeight: FontWeight.bold,
+                                    color: Colors.amber,
+                                  ),
+                                ),
+                                const SizedBox(height: 8),
+                                const Text(
+                                  'Crie sua conta para começar',
+                                  style: TextStyle(
+                                    fontSize: 16,
+                                    color: Colors.grey,
+                                  ),
+                                ),
+                              ],
                             ),
                           ),
-                          const SizedBox(height: 16),
+                          const SizedBox(height: 32),
 
-                          // Link para login
-                          Row(
-                            mainAxisAlignment: MainAxisAlignment.center,
-                            children: [
-                              const Text('Já tem uma conta? '),
-                              TextButton(
-                                onPressed: () {
-                                  Navigator.pop(context);
-                                },
-                                child: const Text(
-                                  'Fazer Login',
-                                  style: TextStyle(
-                                    color: Colors.amber,
-                                    fontWeight: FontWeight.bold,
-                                  ),
-                                ),
+                          // Card de Cadastro
+                          Container(
+                            constraints: const BoxConstraints(maxWidth: 400),
+                            decoration: BoxDecoration(
+                              borderRadius: BorderRadius.circular(20),
+                              gradient: LinearGradient(
+                                begin: Alignment.topLeft,
+                                end: Alignment.bottomRight,
+                                colors: [
+                                  const Color(0xFF2A1A3E),
+                                  const Color(0xFF1A0E2E),
+                                ],
                               ),
-                            ],
+                              boxShadow: [
+                                BoxShadow(
+                                  color: Colors.amber.withValues(alpha: 0.1),
+                                  blurRadius: 20,
+                                  offset: const Offset(0, 10),
+                                ),
+                              ],
+                            ),
+                            child: Padding(
+                              padding: const EdgeInsets.all(32),
+                              child: Column(
+                                children: [
+                                  // Título da seção
+                                  const Text(
+                                    'Dados da Conta',
+                                    style: TextStyle(
+                                      fontSize: 20,
+                                      fontWeight: FontWeight.bold,
+                                      color: Colors.amber,
+                                    ),
+                                  ),
+                                  const SizedBox(height: 32),
+
+                                  // Campo de nome
+                                  Column(
+                                    crossAxisAlignment: CrossAxisAlignment.start,
+                                    children: [
+                                      Container(
+                                        decoration: BoxDecoration(
+                                          borderRadius: BorderRadius.circular(12),
+                                          color: const Color(0xFF1A0E2E),
+                                          border: Border.all(
+                                            color: Colors.amber.withValues(alpha: 0.3),
+                                          ),
+                                        ),
+                                        child: TextFormField(
+                                          controller: authViewModel.nameController,
+                                          keyboardType: TextInputType.name,
+                                          style: const TextStyle(color: Colors.white),
+                                          decoration: InputDecoration(
+                                            hintText: 'Nome completo',
+                                            hintStyle: TextStyle(color: Colors.grey.shade400),
+                                            prefixIcon: const Icon(Icons.person, color: Colors.amber),
+                                            border: InputBorder.none,
+                                            contentPadding: const EdgeInsets.symmetric(
+                                              horizontal: 16,
+                                              vertical: 16,
+                                            ),
+                                          ),
+                                        ),
+                                      ),
+                                      if (authViewModel.nameError != null)
+                                        Padding(
+                                          padding: const EdgeInsets.only(top: 8, left: 16),
+                                          child: Text(
+                                            authViewModel.nameError!,
+                                            style: const TextStyle(
+                                              color: Colors.red,
+                                              fontSize: 12,
+                                            ),
+                                          ),
+                                        ),
+                                    ],
+                                  ),
+                                  const SizedBox(height: 20),
+
+                                  // Campo de email
+                                  Column(
+                                    crossAxisAlignment: CrossAxisAlignment.start,
+                                    children: [
+                                      Container(
+                                        decoration: BoxDecoration(
+                                          borderRadius: BorderRadius.circular(12),
+                                          color: const Color(0xFF1A0E2E),
+                                          border: Border.all(
+                                            color: Colors.amber.withValues(alpha: 0.3),
+                                          ),
+                                        ),
+                                        child: TextFormField(
+                                          controller: authViewModel.emailController,
+                                          keyboardType: TextInputType.emailAddress,
+                                          style: const TextStyle(color: Colors.white),
+                                          decoration: InputDecoration(
+                                            hintText: 'Email',
+                                            hintStyle: TextStyle(color: Colors.grey.shade400),
+                                            prefixIcon: const Icon(Icons.email, color: Colors.amber),
+                                            border: InputBorder.none,
+                                            contentPadding: const EdgeInsets.symmetric(
+                                              horizontal: 16,
+                                              vertical: 16,
+                                            ),
+                                          ),
+                                        ),
+                                      ),
+                                      if (authViewModel.emailError != null)
+                                        Padding(
+                                          padding: const EdgeInsets.only(top: 8, left: 16),
+                                          child: Text(
+                                            authViewModel.emailError!,
+                                            style: const TextStyle(
+                                              color: Colors.red,
+                                              fontSize: 12,
+                                            ),
+                                          ),
+                                        ),
+                                    ],
+                                  ),
+                                  const SizedBox(height: 20),
+
+                                  // Campo de senha
+                                  Column(
+                                    crossAxisAlignment: CrossAxisAlignment.start,
+                                    children: [
+                                      Container(
+                                        decoration: BoxDecoration(
+                                          borderRadius: BorderRadius.circular(12),
+                                          color: const Color(0xFF1A0E2E),
+                                          border: Border.all(
+                                            color: Colors.amber.withValues(alpha: 0.3),
+                                          ),
+                                        ),
+                                        child: TextFormField(
+                                          controller: authViewModel.passwordController,
+                                          obscureText: !authViewModel.showPassword,
+                                          style: const TextStyle(color: Colors.white),
+                                          decoration: InputDecoration(
+                                            hintText: 'Senha (mínimo 6 caracteres)',
+                                            hintStyle: TextStyle(color: Colors.grey.shade400),
+                                            prefixIcon: const Icon(Icons.lock, color: Colors.amber),
+                                            suffixIcon: IconButton(
+                                              icon: Icon(
+                                                authViewModel.showPassword
+                                                    ? Icons.visibility_off
+                                                    : Icons.visibility,
+                                                color: Colors.amber,
+                                              ),
+                                              onPressed: authViewModel.togglePasswordVisibility,
+                                            ),
+                                            border: InputBorder.none,
+                                            contentPadding: const EdgeInsets.symmetric(
+                                              horizontal: 16,
+                                              vertical: 16,
+                                            ),
+                                          ),
+                                        ),
+                                      ),
+                                      if (authViewModel.passwordError != null)
+                                        Padding(
+                                          padding: const EdgeInsets.only(top: 8, left: 16),
+                                          child: Text(
+                                            authViewModel.passwordError!,
+                                            style: const TextStyle(
+                                              color: Colors.red,
+                                              fontSize: 12,
+                                            ),
+                                          ),
+                                        ),
+                                    ],
+                                  ),
+                                  const SizedBox(height: 20),
+
+                                  // Campo de confirmação de senha
+                                  Column(
+                                    crossAxisAlignment: CrossAxisAlignment.start,
+                                    children: [
+                                      Container(
+                                        decoration: BoxDecoration(
+                                          borderRadius: BorderRadius.circular(12),
+                                          color: const Color(0xFF1A0E2E),
+                                          border: Border.all(
+                                            color: Colors.amber.withValues(alpha: 0.3),
+                                          ),
+                                        ),
+                                        child: TextFormField(
+                                          controller: authViewModel.confirmPasswordController,
+                                          obscureText: !authViewModel.showPassword,
+                                          style: const TextStyle(color: Colors.white),
+                                          decoration: InputDecoration(
+                                            hintText: 'Confirmar senha',
+                                            hintStyle: TextStyle(color: Colors.grey.shade400),
+                                            prefixIcon: const Icon(Icons.lock_outline, color: Colors.amber),
+                                            border: InputBorder.none,
+                                            contentPadding: const EdgeInsets.symmetric(
+                                              horizontal: 16,
+                                              vertical: 16,
+                                            ),
+                                          ),
+                                        ),
+                                      ),
+                                      if (authViewModel.confirmPasswordError != null)
+                                        Padding(
+                                          padding: const EdgeInsets.only(top: 8, left: 16),
+                                          child: Text(
+                                            authViewModel.confirmPasswordError!,
+                                            style: const TextStyle(
+                                              color: Colors.red,
+                                              fontSize: 12,
+                                            ),
+                                          ),
+                                        ),
+                                    ],
+                                  ),
+                                  const SizedBox(height: 32),
+
+                                  // Botão de cadastro
+                                  Container(
+                                    width: double.infinity,
+                                    height: 50,
+                                    decoration: BoxDecoration(
+                                      borderRadius: BorderRadius.circular(12),
+                                      gradient: LinearGradient(
+                                        colors: [
+                                          Colors.amber.shade400,
+                                          Colors.amber.shade600,
+                                        ],
+                                      ),
+                                      boxShadow: [
+                                        BoxShadow(
+                                          color: Colors.amber.withValues(alpha: 0.3),
+                                          blurRadius: 8,
+                                          offset: const Offset(0, 4),
+                                        ),
+                                      ],
+                                    ),
+                                    child: Material(
+                                      color: Colors.transparent,
+                                      child: InkWell(
+                                        borderRadius: BorderRadius.circular(12),
+                                        onTap: authViewModel.isLoading
+                                            ? null
+                                            : () => _handleRegister(context, authViewModel),
+                                        child: Container(
+                                          alignment: Alignment.center,
+                                          child: authViewModel.isLoading
+                                              ? const SizedBox(
+                                                  height: 20,
+                                                  width: 20,
+                                                  child: CircularProgressIndicator(
+                                                    strokeWidth: 2,
+                                                    color: Colors.black,
+                                                  ),
+                                                )
+                                              : const Text(
+                                                  'Criar Conta',
+                                                  style: TextStyle(
+                                                    fontSize: 16,
+                                                    fontWeight: FontWeight.bold,
+                                                    color: Colors.black,
+                                                  ),
+                                                ),
+                                        ),
+                                      ),
+                                    ),
+                                  ),
+                                  const SizedBox(height: 24),
+
+                                  // Link para login
+                                  Row(
+                                    mainAxisAlignment: MainAxisAlignment.center,
+                                    children: [
+                                      const Text(
+                                        'Já tem uma conta? ',
+                                        style: TextStyle(color: Colors.grey),
+                                      ),
+                                      TextButton(
+                                        onPressed: () {
+                                          Navigator.pop(context);
+                                        },
+                                        child: const Text(
+                                          'Fazer Login',
+                                          style: TextStyle(
+                                            color: Colors.amber,
+                                            fontWeight: FontWeight.bold,
+                                          ),
+                                        ),
+                                      ),
+                                    ],
+                                  ),
+                                ],
+                              ),
+                            ),
+                          ),
+                          const SizedBox(height: 24),
+
+                          // Termos de uso
+                          const Padding(
+                            padding: EdgeInsets.symmetric(horizontal: 32),
+                            child: Text(
+                              'Ao criar uma conta, você concorda com nossos Termos de Uso e Política de Privacidade',
+                              style: TextStyle(
+                                color: Colors.grey,
+                                fontSize: 12,
+                              ),
+                              textAlign: TextAlign.center,
+                            ),
                           ),
                         ],
                       ),
-                    ),
-                  ),
-                  const SizedBox(height: 24),
-
-                  // Termos de uso
-                  const Padding(
-                    padding: EdgeInsets.symmetric(horizontal: 32),
-                    child: Text(
-                      'Ao criar uma conta, você concorda com nossos Termos de Uso e Política de Privacidade',
-                      style: TextStyle(
-                        color: Colors.grey,
-                        fontSize: 12,
-                      ),
-                      textAlign: TextAlign.center,
                     ),
                   ),
                 ],
@@ -252,35 +435,21 @@ class CadastroView extends StatelessWidget {
 
     final success = await authViewModel.register(name, email, password, confirmPassword);
     
-    if (context.mounted) {
-      if (success) {
-        // Limpar campos após cadastro bem sucedido
-        authViewModel.nameController.clear();
-        authViewModel.emailController.clear();
-        authViewModel.passwordController.clear();
-        authViewModel.confirmPasswordController.clear();
-        
-        // Mostrar sucesso e voltar para login
-        ScaffoldMessenger.of(context).showSnackBar(
-          const SnackBar(
-            content: Text('Conta criada com sucesso! Você será redirecionado para a tela inicial.'),
-            backgroundColor: Colors.green,
-          ),
-        );
-        
-        // Aguardar um pouco e navegar para tela inicial
-        await Future.delayed(const Duration(seconds: 1));
-        if (context.mounted) {
-          Navigator.pushReplacementNamed(context, '/inicial');
-        }
-      } else if (authViewModel.errorMessage != null) {
-        ScaffoldMessenger.of(context).showSnackBar(
-          SnackBar(
-            content: Text(authViewModel.errorMessage!),
-            backgroundColor: Colors.red,
-          ),
-        );
-      }
+    if (success && context.mounted) {
+      ScaffoldMessenger.of(context).showSnackBar(
+        const SnackBar(
+          content: Text('Conta criada com sucesso!'),
+          backgroundColor: Colors.green,
+        ),
+      );
+      Navigator.pop(context);
+    } else if (context.mounted && authViewModel.errorMessage != null) {
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(
+          content: Text(authViewModel.errorMessage!),
+          backgroundColor: Colors.red,
+        ),
+      );
     }
   }
 }
